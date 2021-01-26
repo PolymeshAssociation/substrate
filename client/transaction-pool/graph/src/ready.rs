@@ -60,7 +60,6 @@ impl<Hash, Ex> Clone for TransactionRef<Hash, Ex> {
 impl<Hash, Ex> Ord for TransactionRef<Hash, Ex> {
 	fn cmp(&self, other: &Self) -> cmp::Ordering {
 		self.transaction.priority.cmp(&other.transaction.priority)
-			.then_with(|| other.transaction.valid_till.cmp(&self.transaction.valid_till))
 			.then_with(|| other.insertion_id.cmp(&self.insertion_id))
 	}
 }
