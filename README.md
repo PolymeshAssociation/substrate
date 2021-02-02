@@ -9,10 +9,10 @@ Substrate is a next-generation framework for blockchain innovation 🚀.
 
 ## Polymath changelog
 
-### [v2.0.1-1] - 2021-01-26
+### [v2.0.1-1] - 2021-02-02
 #### Changed
   - Transactions are now ordered by its `priority` and its `insertion_id`.
-  - `frame_system::weights` is public.
+  - `CheckWeight` can be re-implemented external projects.
 
 ## Trying it out
 

@@ -408,10 +408,10 @@ decl_storage! {
 		ExtrinsicCount: Option<u32>;
 
 		/// The current weight for the block.
-		BlockWeight get(fn block_weight): weights::ExtrinsicsWeight;
+		pub BlockWeight get(fn block_weight): weights::ExtrinsicsWeight;
 
 		/// Total length (in bytes) for all extrinsics put together, for the current block.
-		AllExtrinsicsLen: Option<u32>;
+		pub AllExtrinsicsLen: Option<u32>;
 
 		/// Map of block numbers to block hashes.
 		pub BlockHash get(fn block_hash) build(|_| vec![(T::BlockNumber::zero(), hash69())]):
