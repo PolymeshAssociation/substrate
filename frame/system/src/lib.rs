@@ -136,7 +136,7 @@ pub mod offchain;
 pub(crate) mod mock;
 
 mod extensions;
-mod weights;
+pub mod weights;
 #[cfg(test)]
 mod tests;
 mod default_weights;
