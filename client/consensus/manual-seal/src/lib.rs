@@ -443,7 +443,6 @@ mod tests {
 			Options::default(), true.into(), pool_api.clone(), None, RevalidationType::Full, spawner.clone(),
 		));
 		let env = ProposerFactory::new(
-			spawner.clone(),
 			client.clone(),
 			pool.clone(),
 			None,

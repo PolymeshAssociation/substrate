@@ -59,10 +59,11 @@ pub enum Error {
 	/// Transaction was dropped immediately after it got inserted.
 	#[display(fmt="Transaction couldn't enter the pool because of the limit.")]
 	ImmediatelyDropped,
-	/// Invalid block id.
-	#[error("Transaction cannot be propagated and the local node does not author blocks")]
+
+	#[display(fmt="Transaction cannot be propagated and the local node does not author blocks")]
 	Unactionable,
 
+	/// Invalid block id.
 	InvalidBlockId(String),
 	/// The pool is not accepting future transactions.
 	#[display(fmt="The pool is not accepting future transactions")]
