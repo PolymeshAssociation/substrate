@@ -9,6 +9,11 @@ Substrate is a next-generation framework for blockchain innovation 🚀.
 
 ## Polymath changelog
 
+### [v2.0.1-2] - 2021-02-11
+#### Changed
+  - transaction-pool: drop unpropagable txs if local node can't author blocks, from [3c9b031 commit](https://github.com/paritytech/substrate/commit/3c9b031e449a6249dde07e00066848e0ee481ddf).
+  - Check for equivocation report staleness on `validate_unsigned` as well, from [85c479f commit](https://github.com/paritytech/substrate/commit/85c479f2ed3a762de2629faffcdbb70a69e70a6b).
+
 ### [v2.0.1-1] - 2021-02-02
 #### Changed
   - Transactions are now ordered by its `priority` and its `insertion_id`.
