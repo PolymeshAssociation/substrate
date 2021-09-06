@@ -754,7 +754,7 @@ impl<B: BlockT, H: ExHashT> Protocol<B, H> {
 				} else {
 					None
 				},
-				receipt: if !block_data.message_queue.is_empty() {
+				receipt: if !block_data.receipt.is_empty() {
 					Some(block_data.receipt)
 				} else {
 					None

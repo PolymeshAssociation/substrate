@@ -44,7 +44,7 @@ pub fn generate_protocol_config(protocol_id: &ProtocolId) -> ProtocolConfig {
 		name: generate_protocol_name(protocol_id).into(),
 		max_request_size: 1024 * 1024,
 		max_response_size: 16 * 1024 * 1024,
-		request_timeout: Duration::from_secs(40),
+		request_timeout: Duration::from_secs(20),
 		inbound_queue: None,
 	}
 }
@@ -175,7 +175,7 @@ impl <B: BlockT> BlockRequestHandler<B> {
 				is_empty_justification,
 			};
 
-			total_size += block_data.body.len();
+			total_size += block_data.body.iter().map(|ex| ex.len()).sum::<usize>();
 			blocks.push(block_data);
 
 			if blocks.len() >= max_blocks as usize || total_size > MAX_BODY_BYTES {
