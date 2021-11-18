@@ -19,7 +19,7 @@ frame-support = { version = "3.0.0", default-features = false, path = "../suppor
 frame-system = { version = "3.0.0", default-features = false, path = "../system" }
 pallet-contracts-primitives = { version = "3.0.0", default-features = false, path = "common" }
 pallet-contracts-proc-macro = { version = "3.0.0", path = "proc-macro" }
-parity-wasm = { version = "0.41.0", default-features = false }
+parity-wasm = { version = "0.42.2", default-features = false }
 pwasm-utils = { version = "0.16", default-features = false }
 serde = { version = "1.0.101", optional = true, features = ["derive"] }
 sp-core = { version = "3.0.0", default-features = false, path = "../../primitives/core" }
