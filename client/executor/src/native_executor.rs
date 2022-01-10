@@ -45,7 +45,7 @@ use sp_externalities::ExternalitiesExt as _;
 use sp_tasks::new_async_externalities;
 
 /// Default num of pages for the heap
-const DEFAULT_HEAP_PAGES: u64 = 2048;
+const DEFAULT_HEAP_PAGES: u64 = 4096;
 
 /// Set up the externalities and safe calling environment to execute runtime calls.
 ///
