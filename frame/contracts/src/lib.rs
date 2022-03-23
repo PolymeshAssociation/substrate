@@ -85,7 +85,7 @@
 
 #[macro_use]
 mod gas;
-mod benchmarking;
+pub mod benchmarking;
 mod exec;
 mod migration;
 mod schedule;
