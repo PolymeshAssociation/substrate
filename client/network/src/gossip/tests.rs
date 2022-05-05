@@ -108,6 +108,7 @@ fn build_test_full_node(network_config: config::NetworkConfiguration)
 		let (handler, protocol_config) = LightClientRequestHandler::new(
 			&protocol_id,
 			client.clone(),
+			50,
 		);
 		async_std::task::spawn(handler.run().boxed());
 		protocol_config
