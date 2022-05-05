@@ -876,6 +876,8 @@ pub fn build_network<TBl, TExPool, TImpQu, TCl>(
 			let (handler, protocol_config) = BlockRequestHandler::new(
 				&protocol_id,
 				client.clone(),
+				config.network.default_peers_set.in_peers as usize
+					+ config.network.default_peers_set.out_peers as usize,				
 			);
 			spawn_handle.spawn("block_request_handler", handler.run());
 			protocol_config
@@ -891,8 +893,6 @@ pub fn build_network<TBl, TExPool, TImpQu, TCl>(
 			let (handler, protocol_config) = LightClientRequestHandler::new(
 				&protocol_id,
 				client.clone(),
-				config.network.default_peers_set.in_peers as usize
-					+ config.network.default_peers_set.out_peers as usize,
 			);
 			spawn_handle.spawn("light_client_request_handler", handler.run());
 			protocol_config
