@@ -224,7 +224,7 @@ macro_rules! app_crypto_public_full_crypto {
 		$crate::wrap! {
 			/// A generic `AppPublic` wrapper type over $public crypto; this has no specific App.
 			#[derive(
-				Clone, Eq, Hash, PartialEq, PartialOrd, Ord,
+				Default, Clone, Eq, Hash, PartialEq, PartialOrd, Ord,
 				$crate::codec::Encode,
 				$crate::codec::Decode,
 				$crate::RuntimeDebug,
@@ -261,7 +261,7 @@ macro_rules! app_crypto_public_not_full_crypto {
 		$crate::wrap! {
 			/// A generic `AppPublic` wrapper type over $public crypto; this has no specific App.
 			#[derive(
-				Clone, Eq, PartialEq, Ord, PartialOrd,
+				Default, Clone, Eq, PartialEq, Ord, PartialOrd,
 				$crate::codec::Encode,
 				$crate::codec::Decode,
 				$crate::RuntimeDebug,
@@ -437,7 +437,7 @@ macro_rules! app_crypto_signature_full_crypto {
 	($sig:ty, $key_type:expr, $crypto_type:expr) => {
 		$crate::wrap! {
 			/// A generic `AppPublic` wrapper type over $public crypto; this has no specific App.
-			#[derive(Clone, Eq, PartialEq,
+			#[derive(Clone, Default, Eq, PartialEq,
 				$crate::codec::Encode,
 				$crate::codec::Decode,
 				$crate::RuntimeDebug,
@@ -472,7 +472,7 @@ macro_rules! app_crypto_signature_not_full_crypto {
 	($sig:ty, $key_type:expr, $crypto_type:expr) => {
 		$crate::wrap! {
 			/// A generic `AppPublic` wrapper type over $public crypto; this has no specific App.
-			#[derive(Clone, Eq, PartialEq,
+			#[derive(Clone, Default, Eq, PartialEq,
 				$crate::codec::Encode,
 				$crate::codec::Decode,
 				$crate::scale_info::TypeInfo,
