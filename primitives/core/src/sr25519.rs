@@ -72,6 +72,7 @@ pub const CRYPTO_ID: CryptoTypeId = CryptoTypeId(*b"sr25");
 	Copy,
 	Encode,
 	Decode,
+	Default,
 	PassByInner,
 	MaxEncodedLen,
 	TypeInfo,
@@ -255,6 +256,12 @@ impl Clone for Signature {
 		let mut r = [0u8; 64];
 		r.copy_from_slice(&self.0[..]);
 		Signature(r)
+	}
+}
+
+impl Default for Signature {
+	fn default() -> Self {
+		Signature([0u8; 64])
 	}
 }
 

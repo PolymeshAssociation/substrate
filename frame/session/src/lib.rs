@@ -408,7 +408,7 @@ pub mod pallet {
 		type SessionHandler: SessionHandler<Self::ValidatorId>;
 
 		/// The keys.
-		type Keys: OpaqueKeys + Member + Parameter + MaybeSerializeDeserialize;
+		type Keys: OpaqueKeys + Member + Parameter + Default + MaybeSerializeDeserialize;
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
