@@ -1586,7 +1586,7 @@ macro_rules! impl_opaque_keys_inner {
 	) => {
 		$( #[ $attr ] )*
 		#[derive(
-			Clone, PartialEq, Eq,
+			Default, Clone, PartialEq, Eq,
 			$crate::codec::Encode,
 			$crate::codec::Decode,
 			$crate::scale_info::TypeInfo,

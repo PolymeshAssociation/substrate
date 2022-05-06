@@ -125,6 +125,12 @@ impl From<&Public> for CryptoTypePublicPair {
 
 impl Derive for Public {}
 
+impl Default for Public {
+	fn default() -> Self {
+		Public([0u8; 33])
+	}
+}
+
 impl AsRef<[u8]> for Public {
 	fn as_ref(&self) -> &[u8] {
 		&self.0[..]
