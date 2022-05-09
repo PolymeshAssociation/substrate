@@ -209,7 +209,8 @@ impl<B: BlockT> BlockRequestHandler<B> {
 						rep::SAME_SMALL_REQUEST
 					} else {
 						rep::SAME_REQUEST
-					});				}
+					});
+				}
 			},
 			None => {
 				self.seen_requests.put(key.clone(), SeenRequestsValue::First);
@@ -219,12 +220,13 @@ impl<B: BlockT> BlockRequestHandler<B> {
 		debug!(
 			target: LOG_TARGET,
 			"Handling block request from {}: Starting at `{:?}` with maximum blocks \
-			 of `{}`, direction `{:?}` and attributes `{:?}`.",
+			 of `{}`, direction `{:?}` and attributes `{:?}` with reputation change `{:?}`.",
 			peer,
 			from_block_id,
 			max_blocks,
 			direction,
 			attributes,
+			reputation_change,
 		);
 
 		let result = if reputation_change.is_none() {
