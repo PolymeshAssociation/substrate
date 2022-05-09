@@ -34,6 +34,8 @@
 
 mod peersstate;
 
+
+use futures::{channel::oneshot, prelude::*};
 use std::{collections::HashSet, collections::VecDeque};
 use futures::prelude::*;
 use log::{debug, error, trace};
@@ -45,7 +47,7 @@ use sp_utils::mpsc::{tracing_unbounded, TracingUnboundedSender, TracingUnbounded
 pub use libp2p::PeerId;
 
 /// We don't accept nodes whose reputation is under this value.
-const BANNED_THRESHOLD: i32 = 82 * (i32::min_value() / 100);
+pub const BANNED_THRESHOLD: i32 = 82 * (i32::min_value() / 100);
 /// Reputation change for a node when we get disconnected from it.
 const DISCONNECT_REPUTATION_CHANGE: i32 = -256;
 /// Amount of time between the moment we disconnect from a node and the moment we remove it from
@@ -61,6 +63,7 @@ enum Action {
 	ReportPeer(PeerId, ReputationChange),
 	AddToPeersSet(SetId, PeerId),
 	RemoveFromPeersSet(SetId, PeerId),
+	PeerReputation(PeerId, oneshot::Sender<i32>),
 }
 
 /// Identifier of a set in the peerset.
@@ -160,6 +163,16 @@ impl PeersetHandle {
 	/// Remove a peer from a set.
 	pub fn remove_from_peers_set(&self, set_id: SetId, peer_id: PeerId) {
 		let _ = self.tx.unbounded_send(Action::RemoveFromPeersSet(set_id, peer_id));
+	}
+
+	/// Returns the reputation value of the peer.
+	pub async fn peer_reputation(self, peer_id: PeerId) -> Result<i32, ()> {
+		let (tx, rx) = oneshot::channel();
+
+		let _ = self.tx.unbounded_send(Action::PeerReputation(peer_id, tx));
+
+		// The channel can only be closed if the peerset no longer exists.
+		rx.await.map_err(|_| ())
 	}
 }
 
@@ -436,6 +449,11 @@ impl Peerset {
 		}
 	}
 
+	fn on_peer_reputation(&mut self, peer_id: PeerId, pending_response: oneshot::Sender<i32>) {
+		let reputation = self.data.peer_reputation(peer_id);
+		let _ = pending_response.send(reputation.reputation());
+	}
+
 	/// Updates the value of `self.latest_time_update` and performs all the updates that happen
 	/// over time, such as reputation increases for staying connected.
 	fn update_time(&mut self) {
@@ -703,6 +721,8 @@ impl Stream for Peerset {
 					self.add_to_peers_set(sets_name, peer_id),
 				Action::RemoveFromPeersSet(sets_name, peer_id) =>
 					self.on_remove_from_peers_set(sets_name, peer_id),
+				Action::PeerReputation(peer_id, pending_response) =>
+					self.on_peer_reputation(peer_id, pending_response),
 			}
 		}
 	}

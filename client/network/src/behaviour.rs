@@ -37,6 +37,7 @@ use libp2p::swarm::{
 use log::debug;
 use prost::Message;
 use sp_consensus::{BlockOrigin, import_queue::{IncomingBlock, Origin}};
+use sc_peerset::PeersetHandle;
 use sp_runtime::{traits::{Block as BlockT, NumberFor}, Justification};
 use std::{
 	borrow::Cow,
@@ -190,6 +191,7 @@ impl<B: BlockT, H: ExHashT> Behaviour<B, H> {
 		light_client_request_protocol_config: request_responses::ProtocolConfig,
 		// All remaining request protocol configs.
 		mut request_response_protocols: Vec<request_responses::ProtocolConfig>,
+		peerset: PeersetHandle,
 	) -> Result<Self, request_responses::RegisterError> {
 		// Extract protocol name and add to `request_response_protocols`.
 		let block_request_protocol_name = block_request_protocol_config.name.to_string();
@@ -203,7 +205,10 @@ impl<B: BlockT, H: ExHashT> Behaviour<B, H> {
 			discovery: disco_config.finish(),
 			bitswap: bitswap.into(),
 			request_responses:
-				request_responses::RequestResponsesBehaviour::new(request_response_protocols.into_iter())?,
+				request_responses::RequestResponsesBehaviour::new(
+					request_response_protocols.into_iter(),
+					peerset,
+				)?,
 			light_client_request_sender,
 			events: VecDeque::new(),
 			role,
