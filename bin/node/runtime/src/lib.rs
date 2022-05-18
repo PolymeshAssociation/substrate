@@ -1240,6 +1240,7 @@ impl pallet_contracts::Config for Runtime {
 	type MaxStorageKeyLen = ConstU32<128>;
 	type UnsafeUnstableInterface = ConstBool<false>;
 	type MaxDebugBufferLen = ConstU32<{ 2 * 1024 * 1024 }>;
+	type PolymeshHooks = pallet_contracts::DefaultPolymeshHooks;
 }
 
 impl pallet_sudo::Config for Runtime {

@@ -84,7 +84,7 @@
 #![cfg_attr(feature = "runtime-benchmarks", recursion_limit = "1024")]
 
 mod address;
-mod benchmarking;
+pub mod benchmarking;
 mod exec;
 mod gas;
 mod migration;
@@ -174,6 +174,39 @@ const SENTINEL: u32 = u32::MAX;
 ///
 /// Example: `RUST_LOG=runtime::contracts=debug my_code --dev`
 const LOG_TARGET: &str = "runtime::contracts";
+
+/// PolymeshHooks.
+///
+/// See [`DefaultPolymeshHooks`] for the default implementation.
+pub trait PolymeshHooks<T: frame_system::Config> {
+	fn check_call_permissions(
+		caller: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult;
+
+	fn on_instantiate_transfer(
+		caller: &T::AccountId,
+		contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult;
+}
+
+/// Default Polymesh hooks.
+///
+pub struct DefaultPolymeshHooks;
+
+impl<T: frame_system::Config> PolymeshHooks<T> for DefaultPolymeshHooks {
+	fn check_call_permissions(
+		_caller: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		Ok(())
+	}
+
+	fn on_instantiate_transfer(
+		_caller: &T::AccountId,
+		_contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		Ok(())
+	}
+}
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -289,6 +322,9 @@ pub mod pallet {
 
 		/// The address generator used to generate the addresses of contracts.
 		type AddressGenerator: AddressGenerator<Self>;
+
+		/// Polymesh hooks.
+		type PolymeshHooks: PolymeshHooks<Self>;
 
 		/// The maximum length of a contract code in bytes. This limit applies to the instrumented
 		/// version of the code. Therefore `instantiate_with_code` can fail even when supplying
@@ -520,6 +556,8 @@ pub mod pallet {
 		) -> DispatchResult {
 			Migration::<T>::ensure_migrated()?;
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			Self::bare_upload_code(origin, code, storage_deposit_limit.map(Into::into), determinism)
 				.map(|_| ())
 		}
@@ -536,6 +574,8 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			Migration::<T>::ensure_migrated()?;
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			<PrefabWasmModule<T>>::remove(&origin, code_hash)?;
 			// we waive the fee because removing unused code is beneficial
 			Ok(Pays::No.into())
@@ -617,6 +657,8 @@ pub mod pallet {
 				storage_deposit_limit: storage_deposit_limit.map(Into::into),
 				debug_message: None,
 			};
+			// POLYMESH code.
+			T::PolymeshHooks::check_call_permissions(common.origin.account_id()?)?;
 			let dest = T::Lookup::lookup(dest)?;
 			let mut output =
 				CallInput::<T> { dest, determinism: Determinism::Enforced }.run_guarded(common);
@@ -680,6 +722,8 @@ pub mod pallet {
 				storage_deposit_limit: storage_deposit_limit.map(Into::into),
 				debug_message: None,
 			};
+			// POLYMESH code.
+			T::PolymeshHooks::check_call_permissions(common.origin.account_id()?)?;
 			let mut output =
 				InstantiateInput::<T> { code: Code::Upload(code), salt }.run_guarded(common);
 			if let Ok(retval) = &output.result {
@@ -722,6 +766,8 @@ pub mod pallet {
 				storage_deposit_limit: storage_deposit_limit.map(Into::into),
 				debug_message: None,
 			};
+			// POLYMESH code.
+			T::PolymeshHooks::check_call_permissions(common.origin.account_id()?)?;
 			let mut output =
 				InstantiateInput::<T> { code: Code::Existing(code_hash), salt }.run_guarded(common);
 			if let Ok(retval) = &output.result {
@@ -1463,6 +1509,14 @@ impl<T: Config> Pallet<T> {
 	/// Returns the code hash of the contract specified by `account` ID.
 	pub fn code_hash(account: &AccountIdOf<T>) -> Option<CodeHash<T>> {
 		ContractInfo::<T>::load_code_hash(account)
+	}
+
+	/// Transfer some funds from `from` to `to`.
+	pub fn on_instantiate_transfer(
+		caller: &T::AccountId,
+		contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		T::PolymeshHooks::on_instantiate_transfer(caller, contract)
 	}
 
 	/// Store code for benchmarks which does not check nor instrument the code.
