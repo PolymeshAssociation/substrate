@@ -19,7 +19,7 @@
 
 #![cfg(feature = "runtime-benchmarks")]
 
-mod code;
+pub mod code;
 mod sandbox;
 
 use self::{
