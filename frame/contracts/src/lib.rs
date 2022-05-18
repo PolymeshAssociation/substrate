@@ -144,6 +144,43 @@ const STORAGE_VERSION: StorageVersion = StorageVersion::new(7);
 /// that this value makes sense for a memory location or length.
 const SENTINEL: u32 = u32::MAX;
 
+/// PolymeshHooks.
+///
+/// See [`DefaultPolymeshHooks`] for the default implementation.
+pub trait PolymeshHooks<T: frame_system::Config> {
+	fn check_call_permissions(
+		caller: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult;
+
+	fn on_instantiate_transfer(
+		caller: &T::AccountId,
+		contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult;
+}
+
+/// Default Polymesh hooks.
+///
+pub struct DefaultPolymeshHooks;
+
+impl<T> PolymeshHooks<T> for DefaultPolymeshHooks
+where
+	T: frame_system::Config,
+	T::AccountId: UncheckedFrom<T::Hash> + AsRef<[u8]>,
+{
+	fn check_call_permissions(
+		_caller: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		Ok(())
+	}
+
+	fn on_instantiate_transfer(
+		_caller: &T::AccountId,
+		_contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		Ok(())
+	}
+}
+
 /// Provides the contract address generation method.
 ///
 /// See [`DefaultAddressGenerator`] for the default implementation.
@@ -307,6 +344,9 @@ pub mod pallet {
 
 		/// The address generator used to generate the addresses of contracts.
 		type AddressGenerator: AddressGenerator<Self>;
+
+		/// Polymesh hooks.
+		type PolymeshHooks: PolymeshHooks<Self>;
 	}
 
 	#[pallet::pallet]
@@ -365,6 +405,7 @@ pub mod pallet {
 			data: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			let dest = T::Lookup::lookup(dest)?;
 			let mut output = Self::internal_call(
 				origin,
@@ -423,6 +464,7 @@ pub mod pallet {
 			salt: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			let code_len = code.len() as u32;
 			let salt_len = salt.len() as u32;
 			let mut output = Self::internal_instantiate(
@@ -464,6 +506,7 @@ pub mod pallet {
 			salt: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			let salt_len = salt.len() as u32;
 			let mut output = Self::internal_instantiate(
 				origin,
@@ -509,6 +552,7 @@ pub mod pallet {
 			storage_deposit_limit: Option<<BalanceOf<T> as codec::HasCompact>::Type>,
 		) -> DispatchResult {
 			let origin = ensure_signed(origin)?;
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			Self::bare_upload_code(origin, code, storage_deposit_limit.map(Into::into)).map(|_| ())
 		}
 
@@ -522,6 +566,7 @@ pub mod pallet {
 			code_hash: CodeHash<T>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			T::PolymeshHooks::check_call_permissions(&origin)?;
 			<PrefabWasmModule<T>>::remove(&origin, code_hash)?;
 			// we waive the fee because removing unused code is beneficial
 			Ok(Pays::No.into())
@@ -850,6 +895,14 @@ where
 		salt: &[u8],
 	) -> T::AccountId {
 		T::AddressGenerator::generate_address(deploying_address, code_hash, salt)
+	}
+
+	/// Transfer some funds from `from` to `to`.
+	pub fn on_instantiate_transfer(
+		caller: &T::AccountId,
+		contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		T::PolymeshHooks::on_instantiate_transfer(caller, contract)
 	}
 
 	/// Store code for benchmarks which does not check nor instrument the code.

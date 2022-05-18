@@ -907,7 +907,11 @@ where
 		let frame = self.top_frame();
 		let value = frame.value_transferred;
 
-		Self::transfer(ExistenceRequirement::KeepAlive, self.caller(), &frame.account_id, value)
+		let caller = self.caller();
+		if frame.entry_point == ExportedFunction::Constructor {
+			<Contracts<T>>::on_instantiate_transfer(caller, &frame.account_id)?;
+		}
+		Self::transfer(ExistenceRequirement::KeepAlive, caller, &frame.account_id, value)
 	}
 
 	/// Reference to the current (top) frame.
