@@ -152,6 +152,8 @@ pub trait PolymeshHooks<T: frame_system::Config> {
 		caller: &T::AccountId,
 	) -> frame_support::dispatch::DispatchResult;
 
+	/// `on_instantiate` hook called before transferring initial deposits to
+	/// a new contract.
 	fn on_instantiate_transfer(
 		caller: &T::AccountId,
 		contract: &T::AccountId,
@@ -405,6 +407,7 @@ pub mod pallet {
 			data: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
 			T::PolymeshHooks::check_call_permissions(&origin)?;
 			let dest = T::Lookup::lookup(dest)?;
 			let mut output = Self::internal_call(
@@ -464,6 +467,7 @@ pub mod pallet {
 			salt: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
 			T::PolymeshHooks::check_call_permissions(&origin)?;
 			let code_len = code.len() as u32;
 			let salt_len = salt.len() as u32;
@@ -506,6 +510,7 @@ pub mod pallet {
 			salt: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
 			T::PolymeshHooks::check_call_permissions(&origin)?;
 			let salt_len = salt.len() as u32;
 			let mut output = Self::internal_instantiate(
@@ -552,6 +557,7 @@ pub mod pallet {
 			storage_deposit_limit: Option<<BalanceOf<T> as codec::HasCompact>::Type>,
 		) -> DispatchResult {
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
 			T::PolymeshHooks::check_call_permissions(&origin)?;
 			Self::bare_upload_code(origin, code, storage_deposit_limit.map(Into::into)).map(|_| ())
 		}
@@ -566,6 +572,7 @@ pub mod pallet {
 			code_hash: CodeHash<T>,
 		) -> DispatchResultWithPostInfo {
 			let origin = ensure_signed(origin)?;
+			// POLYMESH code.
 			T::PolymeshHooks::check_call_permissions(&origin)?;
 			<PrefabWasmModule<T>>::remove(&origin, code_hash)?;
 			// we waive the fee because removing unused code is beneficial
@@ -897,7 +904,8 @@ where
 		T::AddressGenerator::generate_address(deploying_address, code_hash, salt)
 	}
 
-	/// Transfer some funds from `from` to `to`.
+	/// `on_instantiate_transfer` hook called before transferring initial deposits to
+	/// a new contract.
 	pub fn on_instantiate_transfer(
 		caller: &T::AccountId,
 		contract: &T::AccountId,

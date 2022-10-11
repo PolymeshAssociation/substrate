@@ -735,6 +735,11 @@ where
 			// We need to charge the storage deposit before the initial transfer so that
 			// it can create the account in case the initial transfer is < ed.
 			if entry_point == ExportedFunction::Constructor {
+				// POLYMESH code start.
+				let top_frame = self.top_frame();
+				let caller = self.caller();
+				<Contracts<T>>::on_instantiate_transfer(caller, &top_frame.account_id)?;
+				// POLYMESH code end.
 				let top_frame = top_frame_mut!(self);
 				top_frame.nested_storage.charge_instantiate(
 					&self.origin,
@@ -907,11 +912,7 @@ where
 		let frame = self.top_frame();
 		let value = frame.value_transferred;
 
-		let caller = self.caller();
-		if frame.entry_point == ExportedFunction::Constructor {
-			<Contracts<T>>::on_instantiate_transfer(caller, &frame.account_id)?;
-		}
-		Self::transfer(ExistenceRequirement::KeepAlive, caller, &frame.account_id, value)
+		Self::transfer(ExistenceRequirement::KeepAlive, self.caller(), &frame.account_id, value)
 	}
 
 	/// Reference to the current (top) frame.
