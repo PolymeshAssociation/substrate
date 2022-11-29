@@ -310,6 +310,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	// and now open database assuming that it has the latest version
 	let mut db_config = kvdb_rocksdb::DatabaseConfig::with_columns(NUM_COLUMNS);
 	db_config.create_if_missing = create;
+	db_config.max_total_wal_size = Some(5u64 << 33); // 40 GB
 
 	let mut memory_budget = std::collections::HashMap::new();
 	match db_type {
