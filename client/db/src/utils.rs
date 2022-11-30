@@ -203,11 +203,11 @@ fn open_database_at<Block: BlockT>(
 	let db: Arc<dyn Database<DbHash>> = match &source {
 		DatabaseSource::ParityDb { path } => open_parity_db::<Block>(path, db_type, true)?,
 		DatabaseSource::RocksDb { path, cache_size, max_total_wal_size } =>
-			open_kvdb_rocksdb::<Block>(path, db_type, true, *cache_size, *max_total_wal_size)?,
+			open_kvdb_rocksdb::<Block>(path, db_type, true, *cache_size, max_total_wal_size)?,
 		DatabaseSource::Custom(db) => db.clone(),
 		DatabaseSource::Auto { paritydb_path, rocksdb_path, cache_size, max_total_wal_size } => {
 			// check if rocksdb exists first, if not, open paritydb
-			match open_kvdb_rocksdb::<Block>(rocksdb_path, db_type, false, *cache_size, *max_total_wal_size) {
+			match open_kvdb_rocksdb::<Block>(rocksdb_path, db_type, false, *cache_size, max_total_wal_size) {
 				Ok(db) => db,
 				Err(OpenDbError::NotEnabled(_)) | Err(OpenDbError::DoesNotExist) =>
 					open_parity_db::<Block>(paritydb_path, db_type, true)?,
