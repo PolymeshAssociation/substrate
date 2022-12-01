@@ -198,6 +198,13 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		Ok(self.database_params().map(|x| x.database_cache_size()).unwrap_or_default())
 	}
 
+	/// Get the database max total wal size.
+	///
+	/// By default this is retrieved from `DatabaseParams` if it is available. Otherwise its `None`.
+	fn database_max_total_wal_size(&self) -> Result<Option<usize>> {
+		Ok(self.database_params().map(|x| x.database_max_total_wal_size()).unwrap_or_default())
+	}
+
 	/// Get the database backend variant.
 	///
 	/// By default this is retrieved from `DatabaseParams` if it is available. Otherwise its `None`.
@@ -210,6 +217,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		&self,
 		base_path: &PathBuf,
 		cache_size: usize,
+		max_total_wal_size: usize,
 		database: Database,
 		role: &Role,
 	) -> Result<DatabaseSource> {
@@ -220,7 +228,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		let rocksdb_path = base_path.join("db").join(role_dir);
 		let paritydb_path = base_path.join("paritydb").join(role_dir);
 		Ok(match database {
-			Database::RocksDb => DatabaseSource::RocksDb { path: rocksdb_path, cache_size },
+			Database::RocksDb => DatabaseSource::RocksDb { path: rocksdb_path, cache_size, max_total_wal_size },
 			Database::ParityDb => DatabaseSource::ParityDb { path: paritydb_path },
 			Database::ParityDbDeprecated => {
 				eprintln!(
@@ -229,7 +237,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 				);
 				DatabaseSource::ParityDb { path: paritydb_path }
 			},
-			Database::Auto => DatabaseSource::Auto { paritydb_path, rocksdb_path, cache_size },
+			Database::Auto => DatabaseSource::Auto { paritydb_path, rocksdb_path, cache_size, max_total_wal_size },
 		})
 	}
 
@@ -485,6 +493,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		let net_config_dir = config_dir.join(DEFAULT_NETWORK_CONFIG_PATH);
 		let client_id = C::client_id();
 		let database_cache_size = self.database_cache_size()?.unwrap_or(1024);
+		let database_max_total_wal_size = self.database_max_total_wal_size()?.unwrap_or(0);
 		let database = self.database()?.unwrap_or(Database::RocksDb);
 		let node_key = self.node_key(&net_config_dir)?;
 		let role = self.role(is_dev)?;
@@ -513,7 +522,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 			)?,
 			keystore_remote,
 			keystore,
-			database: self.database_config(&config_dir, database_cache_size, database, &role)?,
+			database: self.database_config(&config_dir, database_cache_size, database_max_total_wal_size, database, &role)?,
 			state_cache_size: self.state_cache_size()?,
 			state_cache_child_ratio: self.state_cache_child_ratio()?,
 			state_pruning: self.state_pruning(unsafe_pruning, &role)?,
