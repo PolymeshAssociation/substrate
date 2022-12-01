@@ -193,17 +193,17 @@ fn open_database_at<Block: BlockT>(
 	let db: Arc<dyn Database<DbHash>> = match &db_source {
 		DatabaseSource::ParityDb { path } => open_parity_db::<Block>(path, db_type, create)?,
 		#[cfg(feature = "rocksdb")]
-		DatabaseSource::RocksDb { path, cache_size } =>
-			open_kvdb_rocksdb::<Block>(path, db_type, create, *cache_size)?,
+		DatabaseSource::RocksDb { path, cache_size, max_total_wal_size } =>
+			open_kvdb_rocksdb::<Block>(path, db_type, create, *cache_size, *max_total_wal_size)?,
 		DatabaseSource::Custom { db, require_create_flag } => {
 			if *require_create_flag && !create {
 				return Err(OpenDbError::DoesNotExist)
 			}
 			db.clone()
 		},
-		DatabaseSource::Auto { paritydb_path, rocksdb_path, cache_size } => {
+		DatabaseSource::Auto { paritydb_path, rocksdb_path, cache_size, max_total_wal_size } => {
 			// check if rocksdb exists first, if not, open paritydb
-			match open_kvdb_rocksdb::<Block>(rocksdb_path, db_type, false, *cache_size) {
+			match open_kvdb_rocksdb::<Block>(rocksdb_path, db_type, false, *cache_size, *max_total_wal_size) {
 				Ok(db) => db,
 				Err(OpenDbError::NotEnabled(_)) | Err(OpenDbError::DoesNotExist) =>
 					open_parity_db::<Block>(paritydb_path, db_type, create)?,
@@ -299,6 +299,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	db_type: DatabaseType,
 	create: bool,
 	cache_size: usize,
+	max_total_wal_size: Option<u64>,
 ) -> OpenDbResult {
 	// first upgrade database to required version
 	match crate::upgrade::upgrade_db::<Block>(path, db_type) {
@@ -311,6 +312,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	// and now open database assuming that it has the latest version
 	let mut db_config = kvdb_rocksdb::DatabaseConfig::with_columns(NUM_COLUMNS);
 	db_config.create_if_missing = create;
+	db_config.max_total_wal_size = max_total_wal_size.map(|m| m << 20);
 
 	let mut memory_budget = std::collections::HashMap::new();
 	match db_type {
@@ -349,6 +351,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	_db_type: DatabaseType,
 	_create: bool,
 	_cache_size: usize,
+	_max_total_wal_size: Option<u64>,
 ) -> OpenDbResult {
 	Err(OpenDbError::NotEnabled("with-kvdb-rocksdb"))
 }
