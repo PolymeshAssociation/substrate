@@ -238,7 +238,7 @@ fn node_config<
 		transaction_pool: Default::default(),
 		network: network_config,
 		keystore: KeystoreConfig::Path { path: root.join("key"), password: None },
-		database: DatabaseSource::RocksDb { path: root.join("db"), cache_size: 128 },
+		database: DatabaseSource::RocksDb { path: root.join("db"), cache_size: 128, max_total_wal_size: None },
 		trie_cache_maximum_size: Some(16 * 1024 * 1024),
 		state_pruning: Default::default(),
 		blocks_pruning: BlocksPruning::KeepFinalized,
