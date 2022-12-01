@@ -32,7 +32,7 @@ pub struct DatabaseParams {
 
 	/// Limit the total storage capacity that the database can use for WAL files.
 	#[clap(long = "db-max-total-wal-size", value_name = "MiB")]
-	pub database_max_total_wal_size: Option<usize>,
+	pub database_max_total_wal_size: Option<u64>,
 }
 
 impl DatabaseParams {
@@ -47,7 +47,7 @@ impl DatabaseParams {
 	}
 
 	/// Limit the total storage capacity that the database can use for WAL files.
-	pub fn database_max_total_wal_size(&self) -> Option<usize> {
+	pub fn database_max_total_wal_size(&self) -> Option<u64> {
 		self.database_max_total_wal_size
 	}
 }

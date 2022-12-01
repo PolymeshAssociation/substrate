@@ -325,7 +325,7 @@ pub enum DatabaseSource {
 		/// Cache size in MiB. Used only by `RocksDb` variant of `DatabaseSource`.
 		cache_size: usize,
 		/// Max total WAL size in MiB. Used only by `RocksDb` variant of `DatabaseSource`.
-		max_total_wal_size: usize,
+		max_total_wal_size: Option<u64>,
 	},
 	/// Load a RocksDB database from a given path. Recommended for most uses.
 	#[cfg(feature = "rocksdb")]
@@ -335,7 +335,7 @@ pub enum DatabaseSource {
 		/// Cache size in MiB.
 		cache_size: usize,
 		/// Max total WAL size in MiB.
-		max_total_wal_size: usize,
+		max_total_wal_size: Option<u64>,
 	},
 
 	/// Load a ParityDb database from a given path.

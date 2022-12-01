@@ -221,7 +221,7 @@ pub enum DatabaseType {
 impl DatabaseType {
 	fn into_settings(self, path: PathBuf) -> sc_client_db::DatabaseSource {
 		match self {
-			Self::RocksDb => sc_client_db::DatabaseSource::RocksDb { path, cache_size: 512 },
+			Self::RocksDb => sc_client_db::DatabaseSource::RocksDb { path, cache_size: 512, max_total_wal_size: None },
 			Self::ParityDb => sc_client_db::DatabaseSource::ParityDb { path },
 		}
 	}
