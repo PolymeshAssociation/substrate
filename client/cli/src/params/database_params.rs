@@ -29,6 +29,10 @@ pub struct DatabaseParams {
 	/// Limit the memory the database cache can use.
 	#[arg(long = "db-cache", value_name = "MiB")]
 	pub database_cache_size: Option<usize>,
+
+	/// Limit the total storage capacity that the database can use for WAL files.
+	#[clap(long = "db-max-total-wal-size", value_name = "MiB")]
+	pub database_max_total_wal_size: Option<u64>,
 }
 
 impl DatabaseParams {
@@ -40,5 +44,10 @@ impl DatabaseParams {
 	/// Limit the memory the database cache can use.
 	pub fn database_cache_size(&self) -> Option<usize> {
 		self.database_cache_size
+	}
+
+	/// Limit the total storage capacity that the database can use for WAL files.
+	pub fn database_max_total_wal_size(&self) -> Option<u64> {
+		self.database_max_total_wal_size
 	}
 }
