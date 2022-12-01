@@ -298,7 +298,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	db_type: DatabaseType,
 	create: bool,
 	cache_size: usize,
-	max_total_wal_size: usize,
+	max_total_wal_size: Option<u64>,
 ) -> OpenDbResult {
 	// first upgrade database to required version
 	match crate::upgrade::upgrade_db::<Block>(path, db_type) {
@@ -311,7 +311,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	// and now open database assuming that it has the latest version
 	let mut db_config = kvdb_rocksdb::DatabaseConfig::with_columns(NUM_COLUMNS);
 	db_config.create_if_missing = create;
-	db_config.max_total_wal_size = Some((max_total_wal_size as u64) << 20);
+	db_config.max_total_wal_size = max_total_wal_size.map(|m| m << 20);
 
 	let mut memory_budget = std::collections::HashMap::new();
 	match db_type {
@@ -350,7 +350,7 @@ fn open_kvdb_rocksdb<Block: BlockT>(
 	_db_type: DatabaseType,
 	_create: bool,
 	_cache_size: usize,
-	_max_total_wal_size: usize,
+	_max_total_wal_size: Option<u64>,
 ) -> OpenDbResult {
 	Err(OpenDbError::NotEnabled("with-kvdb-rocksdb"))
 }

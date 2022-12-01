@@ -201,7 +201,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 	/// Get the database max total wal size.
 	///
 	/// By default this is retrieved from `DatabaseParams` if it is available. Otherwise its `None`.
-	fn database_max_total_wal_size(&self) -> Result<Option<usize>> {
+	fn database_max_total_wal_size(&self) -> Result<Option<u64>> {
 		Ok(self.database_params().map(|x| x.database_max_total_wal_size()).unwrap_or_default())
 	}
 
@@ -217,7 +217,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		&self,
 		base_path: &PathBuf,
 		cache_size: usize,
-		max_total_wal_size: usize,
+		max_total_wal_size: Option<u64>,
 		database: Database,
 		role: &Role,
 	) -> Result<DatabaseSource> {
@@ -493,7 +493,7 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		let net_config_dir = config_dir.join(DEFAULT_NETWORK_CONFIG_PATH);
 		let client_id = C::client_id();
 		let database_cache_size = self.database_cache_size()?.unwrap_or(1024);
-		let database_max_total_wal_size = self.database_max_total_wal_size()?.unwrap_or(0);
+		let database_max_total_wal_size = self.database_max_total_wal_size()?;
 		let database = self.database()?.unwrap_or(Database::RocksDb);
 		let node_key = self.node_key(&net_config_dir)?;
 		let role = self.role(is_dev)?;
