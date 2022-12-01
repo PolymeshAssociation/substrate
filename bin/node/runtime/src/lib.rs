@@ -1093,6 +1093,7 @@ impl pallet_contracts::Config for Runtime {
 	type DeletionWeightLimit = DeletionWeightLimit;
 	type Schedule = Schedule;
 	type AddressGenerator = pallet_contracts::DefaultAddressGenerator;
+	type PolymeshHooks = pallet_contracts::DefaultPolymeshHooks;
 }
 
 impl pallet_sudo::Config for Runtime {
