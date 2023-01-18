@@ -369,6 +369,13 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
+		/// Placeholder for removed `fill_block`.
+		#[pallet::weight(1_000)]
+		pub fn placeholder_fill_block(origin: OriginFor<T>) -> DispatchResult {
+			ensure_signed_or_root(origin)?;
+			Ok(())
+		}
+
 		/// Make some on-chain remark.
 		///
 		/// # <weight>
