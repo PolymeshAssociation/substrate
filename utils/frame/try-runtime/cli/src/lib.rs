@@ -377,8 +377,7 @@ use sp_core::{
 		OffchainDbExt, OffchainWorkerExt, TransactionPoolExt,
 	},
 	storage::well_known_keys,
-	testing::TaskExecutor,
-	traits::{CallContext, ReadRuntimeVersion, TaskExecutorExt},
+	traits::{CallContext, ReadRuntimeVersion},
 	twox_128, H256,
 };
 use sp_externalities::Extensions;
@@ -815,7 +814,6 @@ where
 /// Build all extensions that we typically use.
 pub(crate) fn full_extensions() -> Extensions {
 	let mut extensions = Extensions::default();
-	extensions.register(TaskExecutorExt::new(TaskExecutor::new()));
 	let (offchain, _offchain_state) = TestOffchainExt::new();
 	let (pool, _pool_state) = TestTransactionPoolExt::new();
 	let keystore = MemoryKeystore::new();
@@ -877,7 +875,6 @@ pub(crate) fn state_machine_call<Block: BlockT, HostFns: HostFunctions>(
 		data,
 		extensions,
 		&sp_state_machine::backend::BackendRuntimeCode::new(&ext.backend).runtime_code()?,
-		sp_core::testing::TaskExecutor::new(),
 		CallContext::Offchain,
 	)
 	.execute(sp_state_machine::ExecutionStrategy::AlwaysWasm)
@@ -917,7 +914,6 @@ pub(crate) fn state_machine_call_with_proof<Block: BlockT, HostFns: HostFunction
 		data,
 		extensions,
 		&runtime_code,
-		sp_core::testing::TaskExecutor::new(),
 		CallContext::Offchain,
 	)
 	.execute(sp_state_machine::ExecutionStrategy::AlwaysWasm)
