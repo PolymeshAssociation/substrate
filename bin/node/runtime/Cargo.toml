@@ -186,7 +186,6 @@ std = [
 	"pallet-staking-runtime-api/std",
 	"pallet-state-trie-migration/std",
 	"pallet-statement/std",
-	"pallet-salary/std",
 	"sp-session/std",
 	"pallet-sudo/std",
 	"frame-support/std",
