@@ -40,7 +40,7 @@ use sc_network::{
 		FullNetworkConfiguration, NonDefaultSetConfig, ProtocolId, SyncMode as SyncOperationMode,
 	},
 	utils::LruHashSet,
-	NotificationsSink, ProtocolName,
+	NotificationsSink, ProtocolName, ReputationChange,
 };
 use sc_network_common::{
 	role::Roles,
@@ -76,7 +76,7 @@ const TICK_TIMEOUT: std::time::Duration = std::time::Duration::from_millis(1100)
 const MAX_KNOWN_BLOCKS: usize = 1024; // ~32kb per peer + LruHashSet overhead
 
 mod rep {
-	use sc_peerset::ReputationChange as Rep;
+	use sc_network::ReputationChange as Rep;
 	/// Peer has different genesis.
 	pub const GENESIS_MISMATCH: Rep = Rep::new_fatal("Genesis mismatch");
 	/// Peer send us a block announcement that failed at validation.
@@ -634,7 +634,7 @@ where
 							.disconnect_peer(peer, self.block_announce_protocol_name.clone());
 						self.network_service.report_peer(
 							peer,
-							sc_peerset::ReputationChange::new_fatal("Invalid justification"),
+							ReputationChange::new_fatal("Invalid justification"),
 						);
 					}
 				},
