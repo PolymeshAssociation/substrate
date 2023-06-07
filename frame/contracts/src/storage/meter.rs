@@ -491,7 +491,10 @@ impl<T: Config> Ext<T> for ReservingExt {
 				// The sender always has enough balance because we checked that it had enough
 				// balance when instantiating the storage meter. There is no way for the sender
 				// which is a plain account to send away this balance in the meantime.
-				let result = T::Currency::transfer(
+				//
+				// POLYMESH: Use `transfer_no_cdd` instead of `transfer`, to avoid CDD check on
+				// `deposit_account`.
+				let result = T::Currency::transfer_no_cdd(
 					origin,
 					deposit_account,
 					*amount,
