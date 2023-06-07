@@ -133,6 +133,20 @@ pub trait Currency<AccountId> {
 		existence_requirement: ExistenceRequirement,
 	) -> DispatchResult;
 
+	/// Transfer some liquid free balance to another staker.  Without CDD check on `dest`.
+	///
+	/// This is a very high-level function. It will ensure all appropriate fees are paid
+	/// and no imbalance in the system remains.
+	/// POLYMESH: Added for `pallet_contracts`.
+	fn transfer_no_cdd(
+		source: &AccountId,
+		dest: &AccountId,
+		value: Self::Balance,
+		existence_requirement: ExistenceRequirement,
+	) -> DispatchResult {
+		Self::transfer(source, dest, value, existence_requirement)
+	}
+
 	/// Deducts up to `value` from the combined balance of `who`, preferring to deduct from the
 	/// free balance. This function cannot fail.
 	///
