@@ -1549,7 +1549,10 @@ impl<T: Config> Pallet<T> {
 
 	/// Return the existential deposit of [`Config::Currency`].
 	fn min_balance() -> BalanceOf<T> {
-		<T::Currency as Inspect<AccountIdOf<T>>>::minimum_balance()
+		// POLYMESH: Need to make sure the contract's account is created.
+		// So we need to return a non-zero amount here.
+		//<T::Currency as Inspect<AccountIdOf<T>>>::minimum_balance()
+		1u32.into()
 	}
 
 	/// Convert gas_limit from 1D Weight to a 2D Weight.

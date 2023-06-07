@@ -532,7 +532,9 @@ impl<T: Config> Ext<T> for ReservingExt {
 		terminated: bool,
 	) -> Result<(), DispatchError> {
 		match amount {
-			Deposit::Charge(amount) => T::Currency::transfer(
+			// POLYMESH: Use `transfer_no_cdd` instead of `transfer`, to avoid CDD check on
+			// `deposit_account`.
+			Deposit::Charge(amount) => T::Currency::transfer_no_cdd(
 				origin,
 				deposit_account,
 				*amount,
