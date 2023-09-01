@@ -169,6 +169,11 @@ pub trait PolymeshHooks<T: frame_system::Config> {
 		caller: &T::AccountId,
 		contract: &T::AccountId,
 	) -> frame_support::dispatch::DispatchResult;
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn register_did(
+		account: T::AccountId
+	) -> frame_support::dispatch::DispatchResult;
 }
 
 /// Default Polymesh hooks.
@@ -185,6 +190,13 @@ impl<T: frame_system::Config> PolymeshHooks<T> for DefaultPolymeshHooks {
 	fn on_instantiate_transfer(
 		_caller: &T::AccountId,
 		_contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		Ok(())
+	}
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn register_did(
+		_account: T::AccountId
 	) -> frame_support::dispatch::DispatchResult {
 		Ok(())
 	}
