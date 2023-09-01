@@ -175,7 +175,7 @@ pub trait PolymeshHooks<T: frame_system::Config> {
 
 	#[cfg(feature = "runtime-benchmarks")]
 	fn register_did_with_cdd(
-		cdd_provider_origin: Option<T::RuntimeOrigin>, 
+		cdd_provider_origin: Option<T::RuntimeOrigin>,
 		account: T::AccountId
 	) -> frame_support::dispatch::DispatchResult;
 }
@@ -205,7 +205,7 @@ impl<T: frame_system::Config> PolymeshHooks<T> for DefaultPolymeshHooks {
 
 	#[cfg(feature = "runtime-benchmarks")]
 	fn register_did_with_cdd(
-		_cdd_provider_origin: Option<T::RuntimeOrigin>, 
+		_cdd_provider_origin: Option<T::RuntimeOrigin>,
 		_account: T::AccountId
 	) -> frame_support::dispatch::DispatchResult {
 		Ok(())
