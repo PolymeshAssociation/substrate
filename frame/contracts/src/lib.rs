@@ -169,6 +169,15 @@ pub trait PolymeshHooks<T: frame_system::Config> {
 		caller: &T::AccountId,
 		contract: &T::AccountId,
 	) -> frame_support::dispatch::DispatchResult;
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn get_cdd_provider_origin() -> Option<T::RuntimeOrigin>;
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn register_did_with_cdd(
+		cdd_provider_origin: Option<T::RuntimeOrigin>, 
+		account: T::AccountId
+	) -> frame_support::dispatch::DispatchResult;
 }
 
 /// Default Polymesh hooks.
@@ -185,6 +194,19 @@ impl<T: frame_system::Config> PolymeshHooks<T> for DefaultPolymeshHooks {
 	fn on_instantiate_transfer(
 		_caller: &T::AccountId,
 		_contract: &T::AccountId,
+	) -> frame_support::dispatch::DispatchResult {
+		Ok(())
+	}
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn get_cdd_provider_origin() -> Option<T::RuntimeOrigin> {
+		None
+	}
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn register_did_with_cdd(
+		_cdd_provider_origin: Option<T::RuntimeOrigin>, 
+		_account: T::AccountId
 	) -> frame_support::dispatch::DispatchResult {
 		Ok(())
 	}

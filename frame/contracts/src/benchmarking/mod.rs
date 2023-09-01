@@ -209,6 +209,9 @@ benchmarks! {
 		let k in 0..1024;
 		let instance = Contract::<T>::with_storage(WasmModule::dummy(), k, T::Schedule::get().limits.payload_len)?;
 		instance.info()?.queue_trie_for_deletion()?;
+		// Required for linking the contract to a did
+		let cdd_origin = T::PolymeshHooks::get_cdd_provider_origin();
+		T::PolymeshHooks::register_did_with_cdd(cdd_origin, instance.caller.clone())?;
 	}: {
 		ContractInfo::<T>::process_deletion_queue_batch(Weight::MAX)
 	}
