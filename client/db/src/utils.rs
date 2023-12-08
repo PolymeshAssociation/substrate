@@ -191,6 +191,7 @@ fn open_database_at<Block: BlockT>(
 	create: bool,
 ) -> OpenDbResult {
 	let db: Arc<dyn Database<DbHash>> = match &db_source {
+		#[cfg(feature = "paritydb")]
 		DatabaseSource::ParityDb { path } => open_parity_db::<Block>(path, db_type, create)?,
 		#[cfg(feature = "rocksdb")]
 		DatabaseSource::RocksDb { path, cache_size, max_total_wal_size } =>
@@ -205,6 +206,7 @@ fn open_database_at<Block: BlockT>(
 			// check if rocksdb exists first, if not, open paritydb
 			match open_kvdb_rocksdb::<Block>(rocksdb_path, db_type, false, *cache_size, *max_total_wal_size) {
 				Ok(db) => db,
+				#[cfg(feature = "paritydb")]
 				Err(OpenDbError::NotEnabled(_)) | Err(OpenDbError::DoesNotExist) =>
 					open_parity_db::<Block>(paritydb_path, db_type, create)?,
 				Err(as_is) => return Err(as_is),
@@ -261,6 +263,7 @@ impl From<OpenDbError> for sp_blockchain::Error {
 	}
 }
 
+#[cfg(feature = "paritydb")]
 impl From<parity_db::Error> for OpenDbError {
 	fn from(err: parity_db::Error) -> Self {
 		if matches!(err, parity_db::Error::DatabaseNotFound) {
@@ -281,6 +284,7 @@ impl From<io::Error> for OpenDbError {
 	}
 }
 
+#[cfg(feature = "paritydb")]
 fn open_parity_db<Block: BlockT>(path: &Path, db_type: DatabaseType, create: bool) -> OpenDbResult {
 	match crate::parity_db::open(path, db_type, create, false) {
 		Ok(db) => Ok(db),

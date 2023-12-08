@@ -322,7 +322,13 @@ mod tests {
 				transaction_pool: Default::default(),
 				network: NetworkConfiguration::new_memory(),
 				keystore: sc_service::config::KeystoreConfig::InMemory,
+				#[cfg(feature = "paritydb")]
 				database: sc_client_db::DatabaseSource::ParityDb { path: root.clone() },
+				#[cfg(not(feature = "paritydb"))]
+				database: sc_client_db::DatabaseSource::RocksDb {
+					path: root.clone(),
+					..Default::default()
+				},
 				trie_cache_maximum_size: None,
 				state_pruning: None,
 				blocks_pruning: sc_client_db::BlocksPruning::KeepAll,

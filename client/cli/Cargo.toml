@@ -54,4 +54,5 @@ sp-tracing = { version = "6.0.0", path = "../../primitives/tracing" }
 
 [features]
 default = ["rocksdb"]
+paritydb = ["sc-client-db/paritydb"]
 rocksdb = ["sc-client-db/rocksdb"]
